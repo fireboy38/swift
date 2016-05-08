@@ -1,0 +1,85 @@
+sys
+sys FengHuang
+telnet server enable
+dhcp enable 
+dhcp server ip-pool vlan10 
+network 10.2.6.0 mask 255.255.255.0
+dns-list 183.221.253.100 221.137.96.205
+gateway-list 10.2.6.1
+quit 
+dhcp server ip-pool vlan20
+network 10.2.7.0 mask 255.255.255.0
+dns-list 183.221.253.100 221.137.96.205
+gateway-list 10.2.7.1
+quit 
+dhcp server forbidden-ip 10.2.6.1 10.2.6.5
+dhcp server forbidden-ip 10.2.6.245 10.2.6.254
+dhcp server forbidden-ip 10.2.7.1 10.2.7.5 
+dhcp server forbidden-ip 10.2.7.245 10.2.7.254 
+interface GigabitEthernet0/1
+port link-mode route
+ip address 10.2.254.10 255.255.255.252
+quit
+interface GigabitEthernet0/2.10
+vlan-type dot1q vid 10
+ip address 10.2.6.1 255.255.255.0
+quit
+interface GigabitEthernet0/2.20
+vlan-type dot1q vid 20
+ip address 10.2.7.1 255.255.255.0
+quit
+interface GigabitEthernet0/2.50
+vlan-type dot1q vid 50
+ip address 192.168.50.1 255.255.255.0
+quit
+ip route-static 0.0.0.0 0.0.0.0 10.2.254.9 
+local-user admin class manage
+password simple admin@123
+service-type telnet 
+authorization-attribute user-role level-15
+quit
+line vty 0 15
+authentication-mode scheme
+quit
+===============================================================================================================
+sys
+sys FengHuangSW
+telnet server enable
+dhcp enable 
+local-user admin
+password simple admin@123
+service-type telnet 
+authorization-attribute level 3
+quit
+line vty 0 15
+authentication-mode scheme
+quit
+vlan 10
+quit
+vlan 20
+quit
+vlan 50
+quit
+interface Vlan-interface10
+ip address dhcp-alloc
+quit
+interface Vlan-interface20
+ip address dhcp-alloc
+quit
+interface Vlan-interface50
+ip address 192.168.50.2 24
+quit
+interface GigabitEthernet1/0/48
+port link-type trunk
+port trunk permit vlan 1 10 20 50
+quit
+port-group manual vlan10
+group-member GigabitEthernet 1/0/1 to GigabitEthernet 1/0/16 
+port link-type access 
+port access vlan 10
+quit
+port-group manual vlan20
+group-member GigabitEthernet 1/0/17 to GigabitEthernet 1/0/47 
+
+port link-type access
+quit
